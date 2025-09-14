@@ -31,6 +31,20 @@ def start_flask():
     print(f"Starting Flask server on port {port}")
     app.run(host='0.0.0.0', port=port, debug=False, use_reloader=False)
 
+# Add this function to set up Chrome for Railway
+def setup_chrome_for_railway():
+    chrome_options = Options()
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--disable-dev-shm-usage')
+    chrome_options.add_argument('--headless')  # Required for server environments
+    chrome_options.add_argument('--disable-gpu')
+    chrome_options.add_argument('--remote-debugging-port=9222')
+    chrome_options.add_argument('--disable-setuid-sandbox')
+    chrome_options.add_argument('--window-size=1920,1080')
+    chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    chrome_options.add_experimental_option('useAutomationExtension', False)
+    return chrome_options
+
 def convert_json_cookies_to_js(json_cookies_data):
     """
     Convert JSON cookie format to JavaScript execution format
@@ -292,7 +306,7 @@ async def handle_websocket(websocket, path=None):
                             print(f"Banner response: {banner}")
                             await websocket.send(banner)
                         else:
-                            error_msg = f"Request failed. Status code: {response.status_code}"
+                            error_msg = f"Request failed. Status code: {response.status_code}
                             print(error_msg)
                             await websocket.send("error:request_failed")
                             
@@ -315,14 +329,9 @@ async def handle_websocket(websocket, path=None):
                         print(f"Cookies will be stored in: {map_dir}/")
                         print(f"Browser profile will be stored in: {storage_dir}/")
                         
-                        chrome_options = Options()
+                        # Use the Railway-optimized Chrome setup
+                        chrome_options = setup_chrome_for_railway()
                         chrome_options.add_argument(f"user-data-dir={storage_dir}")
-                        chrome_options.add_argument("--no-sandbox")
-                        chrome_options.add_argument("--disable-dev-shm-usage")
-                        chrome_options.add_argument("--disable-gpu")
-                        chrome_options.add_argument("--window-size=1920,1080")
-                        chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-                        chrome_options.add_experimental_option('useAutomationExtension', False)
                         
                         driver = webdriver.Chrome(options=chrome_options)
                         driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
