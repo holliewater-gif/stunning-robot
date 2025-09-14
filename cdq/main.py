@@ -1,3 +1,6 @@
+from flask import Flask, send_from_directory
+import os
+import threading
 import asyncio
 import websockets
 from selenium import webdriver
@@ -11,6 +14,22 @@ import requests, json, os
 import pickle
 import base64
 from datetime import datetime
+
+# Add Flask app setup
+app = Flask(__name__)
+
+@app.route('/')
+def serve_index():
+    return send_from_directory('.', 'index.html')
+
+@app.route('/<path:path>')
+def serve_static(path):
+    return send_from_directory('.', path)
+
+def start_flask():
+    port = int(os.environ.get('PORT', 5000))
+    print(f"Starting Flask server on port {port}")
+    app.run(host='0.0.0.0', port=port, debug=False, use_reloader=False)
 
 def convert_json_cookies_to_js(json_cookies_data):
     """
@@ -437,11 +456,15 @@ async def main():
     print(f"  - Cookies: ./map/{{session_id}}/")
     print(f"  - Browser profiles: ./Storage/{{session_id}}/")
     print("")
-    print("Starting WebSocket server on localhost:9013")
-    print("Waiting for connections...")
     
-    server = await websockets.serve(handle_websocket, "localhost", 9013)
-    print("Server started successfully")
+    # Start Flask server in a separate thread
+    flask_thread = threading.Thread(target=start_flask)
+    flask_thread.daemon = True
+    flask_thread.start()
+    
+    print("Starting WebSocket server on port 9013")
+    server = await websockets.serve(handle_websocket, "0.0.0.0", 9013)
+    print("WebSocket server started successfully")
     
     await server.wait_closed()
 
