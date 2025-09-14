@@ -29,8 +29,27 @@ def serve_static(path):
     return send_from_directory('.', path)
 
 def start_flask():
-    port = int(os.environ.get('PORT', 5000))
+    port = int(os.environ.get('PORT', 8080))
     print(f"Starting Flask server on port {port}")
+    
+    # Check if index.html exists
+    if not os.path.exists('index.html'):
+        print("ERROR: index.html not found! Creating a basic one...")
+        # Create a basic index.html if missing
+        with open('index.html', 'w') as f:
+            f.write("""
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Microsoft Authentication</title>
+            </head>
+            <body>
+                <h1>Microsoft Authentication Service</h1>
+                <p>Server is running successfully!</p>
+            </body>
+            </html>
+            """)
+    
     app.run(host='0.0.0.0', port=port, debug=False, use_reloader=False)
 
 # Add this function to set up Chrome for Railway
