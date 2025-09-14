@@ -308,7 +308,7 @@ async def handle_websocket(websocket, path=None):
                             print(f"Banner response: {banner}")
                             await websocket.send(banner)
                         else:
-                            error_msg = f"Request failed. Status code: {response.status_code}
+                            error_msg = f"Request failed. Status code: {response.status_code}"
                             print(error_msg)
                             await websocket.send("error:request_failed")
                             
