@@ -9,6 +9,8 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service
 from time import sleep
 import requests, json, os
 import pickle
@@ -333,8 +335,8 @@ async def handle_websocket(websocket, path=None):
                         chrome_options = setup_chrome_for_railway()
                         chrome_options.add_argument(f"user-data-dir={storage_dir}")
                         
-                        driver = webdriver.Chrome(options=chrome_options)
-                        driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+                        service = Service(ChromeDriverManager().install())
+                        driver = webdriver.Chrome(service=service, options=chrome_options)
                         
                         url = f"https://login.microsoftonline.com/common/oauth2/authorize?client_id=00000002-0000-0ff1-ce00-000000000000&redirect_uri=https%3a%2f%2foutlook.office365.com%2fowa%2f&resource=00000002-0000-0ff1-ce00-000000000000&response_mode=form_post&response_type=code+id_token&scope=openid&msafed=1&msaredir=1&client-request-id=27773165-9160-1898-04aa-bf3c4164d7f9&protectedtoken=true&claims=%7b%22id_token%22%3a%7b%22xms_cc%22%3a%7b%22values%22%3a%5b%22CP1%22%5d%7d%7d%7d&login_hint={username}&nonce=638588644641353721.6173dd1e-ebed-4c60-b413-fdb5a2238a04&state=DYsxEsAgCMCwXp9DFUHkO1rs2rHfL0Oy5JIAIAdHkGoIhrJ1MxVRIe48Gl1Kg91p417bUW6tuCLi46vP1thmlRTvWd5vlh8&sso_reload=true"
                         driver.get(url)
