@@ -39,7 +39,7 @@ app.config['SECRET_KEY'] = 'change-this-secret'
 # For Railway + Gunicorn w/ eventlet worker you can set async_mode='eventlet'.
 # If you run directly via python main.py this threading mode still works, but
 # eventlet is preferred in production for true WebSocket concurrency.
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
 
 # Active sessions keyed by Socket.IO sid
 # Structure:
@@ -535,3 +535,4 @@ if __name__ == "__main__":
     # If deploying with Gunicorn + eventlet worker:
     #   gunicorn --worker-class eventlet -w 1 -b 0.0.0.0:$PORT main:app
     socketio.run(app, host="0.0.0.0", port=port, debug=False)
+
